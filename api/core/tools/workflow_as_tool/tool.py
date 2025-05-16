@@ -95,6 +95,7 @@ class WorkflowTool(Tool):
             workflow_thread_pool_id=self.thread_pool_id,
         )
         assert isinstance(result, dict)
+        logger.info(f"workflow result: {result}")
         data = result.get("data", {})
 
         if err := data.get("error"):

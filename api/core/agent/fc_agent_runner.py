@@ -255,7 +255,7 @@ class FunctionCallAgentRunner(BaseAgentRunner):
                         )
                         # add message file ids
                         message_file_ids.append(message_file_id)
-
+                    logger.info(f"tool_response: {tool_invoke_response}")
                     tool_response = {
                         "tool_call_id": tool_call_id,
                         "tool_call_name": tool_call_name,

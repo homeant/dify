@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Generator, Mapping, Sequence
 from typing import Any, cast
 
@@ -35,6 +36,8 @@ from .exc import (
     ToolParameterError,
 )
 
+
+logger = logging.getLogger(__name__)
 
 class ToolNode(BaseNode[ToolNodeData]):
     """
@@ -206,6 +209,7 @@ class ToolNode(BaseNode[ToolNodeData]):
         variables: dict[str, Any] = {}
 
         for message in message_stream:
+            logger.info(f"message: {message}")
             if message.type in {
                 ToolInvokeMessage.MessageType.IMAGE_LINK,
                 ToolInvokeMessage.MessageType.BINARY_LINK,
