@@ -1,3 +1,5 @@
+import logging
+
 from flask_restful import Resource, reqparse
 from werkzeug.exceptions import BadRequest
 
@@ -7,6 +9,7 @@ from controllers.console.wraps import account_initialization_required, setup_req
 from libs.login import login_required
 from services.ops_service import OpsService
 
+logger = logging.getLogger(__name__)
 
 class TraceAppConfigApi(Resource):
     """
@@ -46,6 +49,7 @@ class TraceAppConfigApi(Resource):
             if not result:
                 raise TracingConfigIsExist()
             if result.get("error"):
+                logger.error(f"create_tracing_app error : {result['error']}")
                 raise TracingConfigCheckError()
             return result
         except Exception as e:

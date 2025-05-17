@@ -369,6 +369,7 @@ class AdvancedChatAppGenerator(MessageBasedAppGenerator):
                 "context": contextvars.copy_context(),
             },
         )
+        logger.info("Worker thread started.")
 
         worker_thread.start()
 

@@ -36,6 +36,7 @@ from models.model import App, AppModelConfig, Conversation, Message, MessageFile
 from models.workflow import WorkflowAppLog, WorkflowRun
 from tasks.ops_trace_task import process_trace_tasks
 
+logger = logging.getLogger(__name__)
 
 class OpsTraceProviderConfigMap(dict[str, dict[str, Any]]):
     def __getitem__(self, provider: str) -> dict[str, Any]:
@@ -287,9 +288,6 @@ class OpsTraceManager:
         :return:
         """
         # auth check
-        if tracing_provider not in provider_config_map and tracing_provider is not None:
-            raise ValueError(f"Invalid tracing provider: {tracing_provider}")
-
         app_config: Optional[App] = db.session.query(App).filter(App.id == app_id).first()
         if not app_config:
             raise ValueError("App not found")

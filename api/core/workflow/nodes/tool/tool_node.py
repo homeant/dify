@@ -98,6 +98,7 @@ class ToolNode(BaseNode[ToolNodeData]):
         conversation_id = self.graph_runtime_state.variable_pool.get(["sys", SystemVariableKey.CONVERSATION_ID])
 
         try:
+            logger.info(f"{self._node_data_cls.__name__} tool invoke start")
             message_stream = ToolEngine.generic_invoke(
                 tool=tool_runtime,
                 tool_parameters=parameters,
@@ -108,6 +109,7 @@ class ToolNode(BaseNode[ToolNodeData]):
                 app_id=self.app_id,
                 conversation_id=conversation_id.text if conversation_id else None,
             )
+            logger.info(f"{self._node_data_cls.__name__} tool invoke success")
         except ToolNodeError as e:
             yield RunCompletedEvent(
                 run_result=NodeRunResult(
@@ -122,8 +124,10 @@ class ToolNode(BaseNode[ToolNodeData]):
 
         try:
             # convert tool messages
+            logger.info(f"{self._node_data_cls.__name__} tool invoke transform message")
             yield from self._transform_message(message_stream, tool_info, parameters_for_log)
         except (PluginDaemonClientSideError, ToolInvokeError) as e:
+            logger.error(f"{self._node_data_cls.__name__} tool invoke transform message: {str(e)}")
             yield RunCompletedEvent(
                 run_result=NodeRunResult(
                     status=WorkflowNodeExecutionStatus.FAILED,
@@ -209,7 +213,7 @@ class ToolNode(BaseNode[ToolNodeData]):
         variables: dict[str, Any] = {}
 
         for message in message_stream:
-            logger.info(f"message: {message}")
+            logger.info(f"tool invoke transform message: {message.type}")
             if message.type in {
                 ToolInvokeMessage.MessageType.IMAGE_LINK,
                 ToolInvokeMessage.MessageType.BINARY_LINK,
@@ -268,6 +272,7 @@ class ToolNode(BaseNode[ToolNodeData]):
             elif message.type == ToolInvokeMessage.MessageType.TEXT:
                 assert isinstance(message.message, ToolInvokeMessage.TextMessage)
                 text += message.message.text
+                logger.info(f"tool invoke transform message: {message.message.text[0:100]}")
                 yield RunStreamChunkEvent(
                     chunk_content=message.message.text, from_variable_selector=[self.node_id, "text"]
                 )
@@ -363,7 +368,7 @@ class ToolNode(BaseNode[ToolNodeData]):
                     agent_logs.append(agent_log)
 
                 yield agent_log
-
+        logger.info(f"{self._node_data_cls.__name__} transform completed message success")
         yield RunCompletedEvent(
             run_result=NodeRunResult(
                 status=WorkflowNodeExecutionStatus.SUCCEEDED,

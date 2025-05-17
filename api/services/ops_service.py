@@ -87,9 +87,6 @@ class OpsService:
         :param tracing_config: tracing config
         :return:
         """
-        if tracing_provider not in provider_config_map and tracing_provider:
-            return {"error": f"Invalid tracing provider: {tracing_provider}"}
-
         config_class, other_keys = (
             provider_config_map[tracing_provider]["config_class"],
             provider_config_map[tracing_provider]["other_keys"],
@@ -150,9 +147,6 @@ class OpsService:
         :param tracing_config: tracing config
         :return:
         """
-        if tracing_provider not in provider_config_map:
-            raise ValueError(f"Invalid tracing provider: {tracing_provider}")
-
         # check if trace config already exists
         current_trace_config = (
             db.session.query(TraceAppConfig)
