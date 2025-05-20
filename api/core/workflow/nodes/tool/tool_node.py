@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Generator, Mapping, Sequence
 from typing import Any, cast
 
@@ -35,6 +36,7 @@ from .exc import (
     ToolParameterError,
 )
 
+logger = logging.getLogger(__name__)
 
 class ToolNode(BaseNode[ToolNodeData]):
     """
@@ -65,6 +67,7 @@ class ToolNode(BaseNode[ToolNodeData]):
             tool_runtime = ToolManager.get_workflow_tool_runtime(
                 self.tenant_id, self.app_id, self.node_id, self.node_data, self.invoke_from
             )
+            logger.info(f"Tool run for node {self.__class__.__name__}: {tool_runtime}")
         except ToolNodeError as e:
             yield RunCompletedEvent(
                 run_result=NodeRunResult(
